@@ -6,6 +6,18 @@
 
 Link to my repository fork: https://github.com/domi-cmd/lecture6-ros2demo
 
+Student Name: Dominic Kronig
+
+Student ID: 22-129-464
+
+ROS2 version used: humble
+
+## Issues encountered
+I only had some issues with getting gazebo to work. This was due to the fact that my building of the packages crashed halfway through, resulting in some packages not having been built. This was relatively easy to fix.
+
+## Commands used
+I used " find student_robotics -type f" instead of "tree student_robotics", since I dont have tree working in the terminal I used. Otherwise I only used the commands requested, as shown in the outputs and submissions below :)
+
 ## Task 1 (a)
 
 ### Terminal output for package structure of *student_robotics*:
@@ -234,6 +246,22 @@ There are only one node each registered as subscriber and publisher for /cmd_vel
 
 ### Answer: What’s the difference between ros2 topic hz and ros2 topic bw? (2 sentences)
 The difference lies in the abreviated words of the two commands, the first outputting the herz (hz), and the second outputting the bandwidth (bw). Herz tells us how many messages are sent per second, whereas bw tells us how many bytes are sent per second.
+
+
+## Task 2 (b)
+
+### Screenshot of rqt_graph showing my nodes and TurtleBot3 nodes connected via topics:
+<img width="1550" height="548" alt="image" src="https://github.com/user-attachments/assets/3d373ba9-9d0a-422f-9e6b-eed73578a16f" />
+
+### Explain: What does the graph show? How are nodes connected? (2-3 sentences)
+The "circle_motion" node is publishing to the *cmd_vel* topic, to which the TurtleBot3 node "turtlebot3_diff_drive" is a subscriber to, while also being a publisher to the topic *odom*. Our custom "odom_monitor" node is subscribed to the *odom* topic, meaning that it receives the messages published by "turtlebot3_diff_drive". There is also a topic *joint_states*, connecting the two TurteBot3 nodes "turtlebot3_joint_state" and "robot_state_publisher".
+
+### Answer: What happens if you stop the circle_motion node? Does odom_monitor still work? Why? (2 sentences)
+The robot keeps doing circles, since the last command published to cmd_vel stays active and is executed repeatedly, even with the node stopped. The "odom_monitor" still works since it is not subscribed to the topic that circle_motion publishes to, but the turtlebot3_diff_drive publisher node instead, which is shown in the change in the diagram below:
+
+<img width="1176" height="543" alt="image" src="https://github.com/user-attachments/assets/fc5491ef-093d-4cb6-9c74-ccf8ae4bc20f" />
+
+
 
 ---
 
