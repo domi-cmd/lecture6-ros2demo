@@ -168,6 +168,73 @@ root@2cf8c30d5397:/workspace/turtlebot3_ws#
 ### Explain: How does pub-sub decoupling work? (3 sentences)
 The decoupling works by communicating through topics, which both publishers and subscribers have access to. A publisher node sends messages to the designated topic(s?), regardless of whether other publishers do the same or any subscriber is listening to the topic. Subscriber nodes subscribe to a topic, regardless of whether any publisher is even sending messages to the topic.
 
+
+## Task 2 (a)
+
+### Terminal output of ros2 topic list showing all active topics
+```cmd
+root@2cf8c30d5397:/workspace/turtlebot3_ws# ros2 topic list
+/clock
+/cmd_vel
+/imu
+/joint_states
+/odom
+/parameter_events
+/performance_metrics
+/robot_description
+/rosout
+/scan
+/tf
+/tf_static
+```
+
+### Terminal output or screenshot: ros2 topic info /cmd_vel showing publishers/subscribers
+```cmd
+root@2cf8c30d5397:/workspace/turtlebot3_ws# ros2 topic info /cmd_vel
+Type: geometry_msgs/msg/Twist
+Publisher count: 1
+Subscription count: 1
+```
+
+### Terminal output or screenshot: ros2 topic hz /odom showing frequency
+```cmd
+root@2cf8c30d5397:/workspace/turtlebot3_ws# ros2 topic hz /odom
+average rate: 18.375
+        min: 0.041s max: 0.079s std dev: 0.01071s window: 20
+average rate: 19.184
+        min: 0.036s max: 0.079s std dev: 0.00926s window: 41
+average rate: 20.164
+        min: 0.036s max: 0.079s std dev: 0.00875s window: 64
+average rate: 19.317
+        min: 0.036s max: 0.091s std dev: 0.01041s window: 81
+average rate: 18.864
+        min: 0.036s max: 0.091s std dev: 0.01079s window: 99
+```
+
+### Terminal output or screenshot: ros2 node list showing all nodes
+```cmd
+root@2cf8c30d5397:/workspace/turtlebot3_ws# ros2 node list
+/circle_motion
+/gazebo
+/odom_monitor
+/robot_state_publisher
+/turtlebot3_diff_drive
+/turtlebot3_imu
+/turtlebot3_joint_state
+/turtlebot3_laserscan
+```
+
+### Answer: What is /odom frequency? Why does frequency matter for robot control? (2-3 sentences)
+The frequency command gives us multiple important metrics for the message traffic of our robot nodes. Very important are both the average rate and the deviation from it, meaning how many messages are published per second (to /odom here). The frequency should be consistent and high enough, since we discussed in the lecture that a sudden lack of node inputs can lead to robot failure (falling over, etc.).
+
+
+### Answer: How many publishers and subscribers does /cmd_vel have when your nodes are running? List them.
+There are only one node each registered as subscriber and publisher for /cmd_vel. Those are the nodes we created previously, meaning the *circle_motion* node as a publisher for /cmd_vel and the *odom_monitor* node as a subscriber.
+
+
+### Answer: What’s the difference between ros2 topic hz and ros2 topic bw? (2 sentences)
+The difference lies in the abreviated words of the two commands, the first outputting the herz (hz), and the second outputting the bandwidth (bw). Herz tells us how many messages are sent per second, whereas bw tells us how many bytes are sent per second.
+
 ---
 
 https://github.com/user-attachments/assets/8124b78b-d82c-4339-b1e3-97d4fc210e88
