@@ -6,11 +6,77 @@
 
 Link to my repository fork: https://github.com/domi-cmd/lecture6-ros2demo
 
-## Task 1
+## Task 1 (a)
+
+### Terminal output for package structure of *student_robotics*:
+```cmd
+root@2cf8c30d5397:/workspace/turtlebot3_ws/src# find student_robotics -type f
+student_robotics/package.xml
+student_robotics/resource/student_robotics
+student_robotics/setup.cfg
+student_robotics/setup.py
+student_robotics/student_robotics/circle_motion.py
+student_robotics/student_robotics/__init__.py
+student_robotics/test/test_copyright.py
+student_robotics/test/test_flake8.py
+student_robotics/test/test_pep257.py
+root@2cf8c30d5397:/workspace/turtlebot3_ws/src#
+```
+
+### Python code for *circe_motion.py*:
+```python
+#!/usr/bin/env python3
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+
+class VelocityPublisher(Node):
+    def __init__(self):
+        super().__init__('velocity_publisher')
+        
+        # Create publisher: message type, topic name, queue size
+        self.publisher = self.create_publisher(
+            Twist,           # Message type
+            '/cmd_vel',      # Topic name
+            10               # Queue size
+        )
+        
+        # Create timer: publish every 0.1 seconds (10 Hz)
+        self.timer = self.create_timer(0.1, self.publish_velocity)
+        
+        self.get_logger().info('Velocity Publisher started! Publishing to /cmd_vel')
+    
+    def publish_velocity(self):
+        msg = Twist()
+        msg.linear.x = 0.3  # use the requested value
+        msg.angular.z = 0.5 # Same here
+        
+        self.publisher.publish(msg)
+        self.get_logger().info(
+            f'Publishing: linear.x={msg.linear.x}, angular.z={msg.angular.z}'
+        )
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = VelocityPublisher()
+    rclpy.spin(node)  # Keep node running
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
 
 ### Circular Motion Gif
 ![circular_motion_gif](https://github.com/user-attachments/assets/e1d16537-efb2-4674-a147-b8c0baff991b)
 
+
+### Explain: Why use create_timer()? (2 sentences)
+By using a timer for when we publish our updates, we ensure that the velocity changes that we publish work the same across different devices. We also avoid blocking the node from processing other events this way.
+
+
+
+
+---
 
 https://github.com/user-attachments/assets/8124b78b-d82c-4339-b1e3-97d4fc210e88
 
