@@ -32,7 +32,7 @@ from geometry_msgs.msg import Twist
 
 class VelocityPublisher(Node):
     def __init__(self):
-        super().__init__('velocity_publisher')
+        super().__init__('circle_motion')
         
         # Create publisher: message type, topic name, queue size
         self.publisher = self.create_publisher(
@@ -74,7 +74,99 @@ if __name__ == '__main__':
 By using a timer for when we publish our updates, we ensure that the velocity changes that we publish work the same across different devices. We also avoid blocking the node from processing other events this way.
 
 
+## Task 1 (b)
 
+### Python code for *odom_monitor.py*:
+```python
+#!/usr/bin/env python3
+import rclpy
+from rclpy.node import Node
+from nav_msgs.msg import Odometry
+
+class OdometrySubscriber(Node):
+    def __init__(self):
+        super().__init__('odom_monitor')
+        
+        # Create subscriber: message type, topic name, callback function, queue size
+        self.subscription = self.create_subscription(
+            Odometry,               # Message type
+            '/odom',                # Topic name
+            self.odometry_callback, # Callback function
+            10                      # Queue size
+        )
+        
+        self.get_logger().info('Odometry Subscriber started! Listening to /odom')
+    
+    def odometry_callback(self, msg):
+        # Extract position
+        x = msg.pose.pose.position.x
+        y = msg.pose.pose.position.y
+        # No need to extract z as we dont log it
+        
+        # Extract linear velocity
+        vx = msg.twist.twist.linear.x
+        vz = msg.twist.twist.angular.z
+        
+        self.get_logger().info(
+            f'Position: x={x:.2f}, y={y:.2f} | Velocity: vx={vx:.2f}, vz={vz:.2f}'
+        )
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = OdometrySubscriber()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+###  Terminal output of both nodes running, showing output:
+```cmd
+root@2cf8c30d5397:/workspace/turtlebot3_ws# ros2 run student_robotics circle_motion
+[INFO] [1775052835.378315929] [circle_motion]: Velocity Publisher started! Publishing to /cmd_vel
+[INFO] [1775052835.433512638] [circle_motion]: Publishing: linear.x=0.3, angular.z=0.5
+[INFO] [1775052835.504599181] [circle_motion]: Publishing: linear.x=0.3, angular.z=0.5
+[INFO] [1775052835.610160851] [circle_motion]: Publishing: linear.x=0.3, angular.z=0.5
+[INFO] [1775052835.708626869] [circle_motion]: Publishing: linear.x=0.3, angular.z=0.5
+[INFO] [1775052835.809572719] [circle_motion]: Publishing: linear.x=0.3, angular.z=0.5
+[INFO] [1775052835.908800739] [circle_motion]: Publishing: linear.x=0.3, angular.z=0.5
+[INFO] [1775052836.017124780] [circle_motion]: Publishing: linear.x=0.3, angular.z=0.5
+[INFO] [1775052836.124535499] [circle_motion]: Publishing: linear.x=0.3, angular.z=0.5
+```
+
+```cmd
+root@2cf8c30d5397:/workspace/turtlebot3_ws# ros2 run student_robotics odom_monitor
+[INFO] [1775052850.243200670] [odom_monitor]: Odometry Subscriber started! Listening to /odom
+[INFO] [1775052850.306469387] [odom_monitor]: Position: x=-0.51, y=0.41 | Velocity: vx=0.30, vz=0.50
+[INFO] [1775052850.358027675] [odom_monitor]: Position: x=-0.51, y=0.40 | Velocity: vx=0.30, vz=0.50
+[INFO] [1775052850.412887484] [odom_monitor]: Position: x=-0.51, y=0.39 | Velocity: vx=0.30, vz=0.50
+[INFO] [1775052850.458454953] [odom_monitor]: Position: x=-0.50, y=0.38 | Velocity: vx=0.30, vz=0.50
+[INFO] [1775052850.530755501] [odom_monitor]: Position: x=-0.50, y=0.37 | Velocity: vx=0.30, vz=0.50
+[INFO] [1775052850.573754875] [odom_monitor]: Position: x=-0.50, y=0.36 | Velocity: vx=0.30, vz=0.50
+[INFO] [1775052850.633129450] [odom_monitor]: Position: x=-0.49, y=0.35 | Velocity: vx=0.30, vz=0.50
+[INFO] [1775052850.693155248] [odom_monitor]: Position: x=-0.49, y=0.34 | Velocity: vx=0.30, vz=0.50
+[INFO] [1775052850.755923647] [odom_monitor]: Position: x=-0.49, y=0.33 | Velocity: vx=0.30, vz=0.50
+[INFO] [1775052850.831955631] [odom_monitor]: Position: x=-0.48, y=0.32 | Velocity: vx=0.30, vz=0.50
+
+```
+
+### Terminal output of ros2 node list showing both nodes:
+```cmd
+root@2cf8c30d5397:/workspace/turtlebot3_ws# ros2 node list
+/circle_motion
+/gazebo
+/odom_monitor
+/robot_state_publisher
+/turtlebot3_diff_drive
+/turtlebot3_imu
+/turtlebot3_joint_state
+/turtlebot3_laserscan
+root@2cf8c30d5397:/workspace/turtlebot3_ws#
+```
+
+### Explain: How does pub-sub decoupling work? (3 sentences)
+The decoupling works by communicating through topics, which both publishers and subscribers have access to. A publisher node sends messages to the designated topic(s?), regardless of whether other publishers do the same or any subscriber is listening to the topic. Subscriber nodes subscribe to a topic, regardless of whether any publisher is even sending messages to the topic.
 
 ---
 
